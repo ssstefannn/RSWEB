@@ -35,6 +35,14 @@ namespace RSWEB.Models
 
         [Display(Name = "Hire Date")]
         [DataType(DataType.Date)]
-        public DateTime HireDate { get; set; }
+        public DateTime? HireDate { get; set; }
+
+        public string FullName
+        {
+            get
+            {
+                return string.Format("{0} {1}", FirstName, LastName);
+            }
+        }
     }
 }

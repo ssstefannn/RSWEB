@@ -28,16 +28,26 @@ namespace RSWEB.Models
 
         [Display(Name = "Enrollment Date")]
         [DataType(DataType.Date)]
-        public DateTime EnrollmentDate { get; set; }
+        public DateTime? EnrollmentDate { get; set; }
 
         [Display(Name = "Acquired Credits")]
-        public int AcquiredCredits { get; set; }
+        public int? AcquiredCredits { get; set; }
 
         [Display(Name = "Current Semester")]
-        public int CurrentSemester { get; set; }
+        public int? CurrentSemester { get; set; }
 
         [Display(Name = "Education Level")]
         [StringLength(25)]
-        public string EducationLevel { get; set; }
+        public string? EducationLevel { get; set; }
+
+        public ICollection<Enrollment>? Enrollments { get; set; }
+
+        public string FullName
+        {
+            get
+            {
+                return string.Format("{0} {1}", FirstName, LastName);
+            }
+        }
     }
 }

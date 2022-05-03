@@ -26,11 +26,11 @@ namespace RSWEB.Models
 
         [StringLength(100)]
         [Display(Name = "Programme")]
-        public string Programme { get; set; }
+        public string? Programme { get; set; }
 
         [StringLength(25)]
         [Display(Name = "Education Level")]
-        public string EducationLevel { get; set; }
+        public string? EducationLevel { get; set; }
 
         public int? FirstTeacherId { get; set; }
         [Display(Name = "First Teacher")]
@@ -39,5 +39,7 @@ namespace RSWEB.Models
         public int? SecondTeacherId { get; set; }
         [Display(Name = "Second Teacher")]
         public Teacher? SecondTeacher { get; set; }
+
+        public ICollection<Enrollment>? Enrollments { get; set; }
     }
 }

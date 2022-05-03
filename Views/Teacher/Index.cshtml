@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RSWEB.Models.Teacher>
+﻿@model RSWEB.ViewModels.TeacherFilterViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -9,32 +9,46 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+
+<form asp-controller="Teacher" asp-action="Index" method="get">
+    <p>
+        First or last name: 
+        <input type="text" asp-for="FullName" />
+        Academic rank:
+        <input type="text" asp-for="AcademicRank" />
+        Degree:
+        <input type="text" asp-for="Degree" />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.FirstName)
+                @Html.DisplayNameFor(model => model.teachers[0].FirstName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LastName)
+                @Html.DisplayNameFor(model => model.teachers[0].LastName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Degree)
+                @Html.DisplayNameFor(model => model.teachers[0].Degree)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AcademicRank)
+                @Html.DisplayNameFor(model => model.teachers[0].AcademicRank)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.OfficeNumber)
+                @Html.DisplayNameFor(model => model.teachers[0].OfficeNumber)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.HireDate)
+                @Html.DisplayNameFor(model => model.teachers[0].HireDate)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.teachers)
         {
         <tr>
             <td>

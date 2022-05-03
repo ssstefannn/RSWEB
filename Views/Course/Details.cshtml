@@ -1,4 +1,4 @@
-﻿@model RSWEB.Models.Course
+﻿@model RSWEB.ViewModels.CourseDetailsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -11,60 +11,71 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
+            @Html.DisplayNameFor(model => model.course.Title)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
+            @Html.DisplayFor(model => model.course.Title)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Credits)
+            @Html.DisplayNameFor(model => model.course.Credits)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Credits)
+            @Html.DisplayFor(model => model.course.Credits)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Semester)
+            @Html.DisplayNameFor(model => model.course.Semester)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Semester)
+            @Html.DisplayFor(model => model.course.Semester)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Programme)
+            @Html.DisplayNameFor(model => model.course.Programme)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Programme)
+            @Html.DisplayFor(model => model.course.Programme)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.EducationLevel)
+            @Html.DisplayNameFor(model => model.course.EducationLevel)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.EducationLevel)
+            @Html.DisplayFor(model => model.course.EducationLevel)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.FirstTeacher)
+            @Html.DisplayNameFor(model => model.course.FirstTeacher)
         </dt>
         <dd class="col-sm-10">
-            @if (Model.FirstTeacherId != null)
+            @if (Model.course.FirstTeacherId != null)
             {
-                <a asp-controller="Teacher" asp-action="Details" asp-route-id="@Model.FirstTeacherId">
-                    @Html.DisplayFor(model => model.FirstTeacher.FirstName)
+                <a asp-controller="Teacher" asp-action="Details" asp-route-id="@Model.course.FirstTeacherId">
+                    @Html.DisplayFor(model => model.course.FirstTeacher.FirstName)
                 </a>
             }
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.SecondTeacher)
+            @Html.DisplayNameFor(model => model.course.SecondTeacher)
         </dt>
         <dd class="col-sm-10">
-            @if (Model.SecondTeacherId != null)
+            @if (Model.course.SecondTeacherId != null)
             {
-                <a asp-controller="Teacher" asp-action="Details" asp-route-id="@Model.SecondTeacherId">
-                    @Html.DisplayFor(model => model.SecondTeacher.FirstName)
+                <a asp-controller="Teacher" asp-action="Details" asp-route-id="@Model.course.SecondTeacherId">
+                    @Html.DisplayFor(model => model.course.SecondTeacher.FirstName)
                 </a>
             }
         </dd>
     </dl>
 </div>
+
+<h2>Enrolled students:</h2>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    @foreach (var student in Model.students)
+    {
+        <p>
+            @Html.DisplayFor(modelItem => student.FullName)
+        </p>
+    }
+</div>
+
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.course?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

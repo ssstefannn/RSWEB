@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using RSWEB.ViewModels;
 
 namespace RSWEB.Controllers
 {
@@ -18,9 +20,43 @@ namespace RSWEB.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string FullName, string AcademicRank, string Degree)
         {
-            return View(await _context.Teachers.ToListAsync());
+            IQueryable<Teacher> teachersQuery = _context.Teachers.AsQueryable();
+            if (!string.IsNullOrEmpty(FullName))
+            {
+                if (FullName.Contains(" "))
+                {
+                    string[] names = FullName.Split(" ");
+                    teachersQuery = teachersQuery.Where(x => x.FirstName.Contains(names[0]) || x.LastName.Contains(names[1]) ||
+                    x.FirstName.Contains(names[1]) || x.LastName.Contains(names[0]));
+                }
+                else
+                {
+                    teachersQuery = teachersQuery.Where(x => x.FirstName.Contains(FullName) || x.LastName.Contains(FullName));
+                }
+                if (!string.IsNullOrEmpty(AcademicRank))
+                {
+                    teachersQuery = teachersQuery.Where(x => x.AcademicRank.Contains(AcademicRank));
+                }
+                if (!string.IsNullOrEmpty(Degree))
+                {
+                    teachersQuery = teachersQuery.Where(x => x.Degree.Contains(Degree));
+                }
+            }
+            if (!string.IsNullOrEmpty(AcademicRank))
+            {
+                teachersQuery = teachersQuery.Where(x => x.AcademicRank.Contains(AcademicRank));
+            }
+            if (!string.IsNullOrEmpty(Degree))
+            {
+                teachersQuery = teachersQuery.Where(x => x.Degree.Contains(Degree));
+            }
+            var TeacherFilterVM = new TeacherFilterViewModel
+            {
+                teachers = await teachersQuery.ToListAsync()
+            };
+            return View(TeacherFilterVM);
         }
 
         public IActionResult Create()
@@ -70,6 +106,8 @@ namespace RSWEB.Controllers
 
         public async Task<IActionResult> Details(int? id)
         {
+            IQueryable<Course> coursesQuery = _context.Courses.AsQueryable();
+
             if (id == null)
             {
                 return NotFound();
@@ -81,8 +119,13 @@ namespace RSWEB.Controllers
             {
                 return NotFound();
             }
-
-            return View(teacher);
+            coursesQuery = coursesQuery.Where(x => x.FirstTeacherId.Equals(id) || x.SecondTeacherId.Equals(id));
+            var TeacherDetailsVM = new TeacherDetailsViewModel
+            {
+                teacher = teacher,
+                courses = await coursesQuery.ToListAsync()
+            };
+            return View(TeacherDetailsVM);
         }
 
         public async Task<IActionResult> Edit(int? id)

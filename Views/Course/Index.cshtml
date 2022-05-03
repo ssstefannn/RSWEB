@@ -1,4 +1,4 @@
-﻿@model IEnumerable<RSWEB.Models.Course>
+﻿@model RSWEB.ViewModels.CourseFilterViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -10,35 +10,47 @@
     <a asp-action="Create">Create New</a>
 </p>
 
+<form asp-controller="Course" asp-action="Index" method="get">
+    <p>
+        Title: 
+        <input type="text" asp-for="Title" />
+        Programme:
+        <input type="text" asp-for="Programme" />
+        Semester:
+        <input type="text" asp-for="Semester" />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Title)
+                @Html.DisplayNameFor(model => model.courses[0].Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Credits)
+                @Html.DisplayNameFor(model => model.courses[0].Credits)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Semester)
+                @Html.DisplayNameFor(model => model.courses[0].Semester)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Programme)
+                @Html.DisplayNameFor(model => model.courses[0].Programme)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EducationLevel)
+                @Html.DisplayNameFor(model => model.courses[0].EducationLevel)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FirstTeacher)
+                @Html.DisplayNameFor(model => model.courses[0].FirstTeacher)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SecondTeacher)
+                @Html.DisplayNameFor(model => model.courses[0].SecondTeacher)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model)
+        @foreach (var item in Model.courses)
         {
         <tr>
             <td>

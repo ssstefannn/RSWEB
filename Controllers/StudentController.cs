@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using RSWEB.ViewModels;
 
 namespace RSWEB.Controllers
 {
@@ -18,9 +19,32 @@ namespace RSWEB.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string FullName, string StudentId)
         {
-            return View(await _context.Students.ToListAsync());
+            IQueryable<Student> studentsQuery = _context.Students.AsQueryable();
+            if (!string.IsNullOrEmpty(FullName))
+            {
+                if (FullName.Contains(" "))
+                {
+                    string[] names = FullName.Split(" ");
+                    studentsQuery = studentsQuery.Where(x => x.FirstName.Contains(names[0]) || x.LastName.Contains(names[1]) ||
+                    x.FirstName.Contains(names[1]) || x.LastName.Contains(names[0]));
+                }
+                else
+                {
+                    studentsQuery = studentsQuery.Where(x => x.FirstName.Contains(FullName) || x.LastName.Contains(FullName));
+                }
+            }
+            if (!string.IsNullOrEmpty(StudentId))
+            {
+                studentsQuery = studentsQuery.Where(x => x.StudentId.Contains(StudentId));
+            }
+            var StudentFilterVM = new StudentFilterViewModel
+            {
+                students = await studentsQuery.ToListAsync()
+            };
+
+            return View(StudentFilterVM);
         }
 
         public IActionResult Create()
@@ -60,7 +84,7 @@ namespace RSWEB.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(long id)
         {
             var student = await _context.Students.FindAsync(id);
             _context.Students.Remove(student);
