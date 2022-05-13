@@ -37,6 +37,8 @@ namespace RSWEB.Models
         [DataType(DataType.Date)]
         public DateTime? HireDate { get; set; }
 
+        public string? profilePicture { get; set; }
+
         public string FullName
         {
             get

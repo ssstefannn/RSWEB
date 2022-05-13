@@ -11,6 +11,15 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
+            Profile picture:
+        </dt>
+        <dd class="col-sm-10">
+            <img src="~/profilePictures/@Model.teacher.profilePicture"
+                 class="rounded-circle"
+                 height="40" width="40"
+                 asp-append-version="true" />
+        </dd>
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.teacher.FirstName)
         </dt>
         <dd class="col-sm-10">
@@ -49,17 +58,9 @@
     </dl>
 </div>
 
-<h2>Courses:</h2>
-<div>
-    @foreach(var course in Model.courses)
-            {
-    <p>
-        @Html.DisplayFor(modelItem => course.Title)
-    </p>
-            }
-</div>
 
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.teacher?.Id">Edit</a> |
+    <a asp-action="EditPicture" asp-route-id="@Model?.teacher.Id">Edit picture</a> |
+    <a asp-action="Edit" asp-route-id="@Model?.teacher.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

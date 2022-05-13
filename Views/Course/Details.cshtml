@@ -65,16 +65,6 @@
     </dl>
 </div>
 
-<h2>Enrolled students:</h2>
-<div>
-    @foreach (var student in Model.students)
-    {
-        <p>
-            @Html.DisplayFor(modelItem => student.FullName)
-        </p>
-    }
-</div>
-
 <div>
     <a asp-action="Edit" asp-route-id="@Model.course?.Id">Edit</a> |
     <a asp-action="Index">Back to List</a>

@@ -42,6 +42,8 @@ namespace RSWEB.Models
 
         public ICollection<Enrollment>? Enrollments { get; set; }
 
+        public string? profilePicture { get; set; }
+
         public string FullName
         {
             get

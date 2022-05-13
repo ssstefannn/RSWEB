@@ -8,16 +8,15 @@ using System.Threading.Tasks;
 
 namespace RSWEB.ViewModels
 {
-    public class TeacherDetailsViewModel
+    public class StudentEditPictureViewModel
     {
-        public Teacher teacher { get; set; }
+
+        public Student? student { get; set; }
 
         [Display(Name = "Upload picture")]
         public IFormFile? profilePictureFile { get; set; }
 
         [Display(Name = "Picture name")]
         public string? profilePictureName { get; set; }
-
-
     }
 }

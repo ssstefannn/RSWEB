@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RSWEB.ViewModels;
+using System.IO;
 
 namespace RSWEB.Controllers
 {
@@ -99,6 +100,17 @@ namespace RSWEB.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var teacher = await _context.Teachers.FindAsync(id);
+            IQueryable<Course> courses = _context.Courses.AsQueryable();
+            IQueryable<Course> courses1 = courses.Where(x => x.FirstTeacherId == teacher.Id);
+            IQueryable<Course> courses2 = courses.Where(x => x.SecondTeacherId == teacher.Id);
+            foreach (var course in courses1)
+            {
+                course.FirstTeacherId = null;
+            }
+            foreach (var course in courses2)
+            {
+                course.SecondTeacherId = null;
+            }
             _context.Teachers.Remove(teacher);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -123,7 +135,7 @@ namespace RSWEB.Controllers
             var TeacherDetailsVM = new TeacherDetailsViewModel
             {
                 teacher = teacher,
-                courses = await coursesQuery.ToListAsync()
+                profilePictureName = teacher.profilePicture
             };
             return View(TeacherDetailsVM);
         }
@@ -179,6 +191,93 @@ namespace RSWEB.Controllers
         {
             return _context.Teachers.Any(e => e.Id == id);
         }
+
+        public async Task<IActionResult> EditPicture(long? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var teacher = _context.Teachers.Where(x => x.Id == id).First();
+            if (teacher == null)
+            {
+                return NotFound();
+            }
+
+            TeacherDetailsViewModel viewmodel = new TeacherDetailsViewModel
+            {
+                teacher = teacher,
+                profilePictureName = teacher.profilePicture
+            };
+
+            return View(viewmodel);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditPicture(long id, TeacherDetailsViewModel viewmodel)
+        {
+            if (id != viewmodel.teacher.Id)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    if (viewmodel.profilePictureFile != null)
+                    {
+                        string uniqueFileName = UploadedFile(viewmodel);
+                        viewmodel.teacher.profilePicture = uniqueFileName;
+                    }
+                    else
+                    {
+                        viewmodel.teacher.profilePicture = viewmodel.profilePictureName;
+                    }
+
+                    _context.Update(viewmodel.teacher);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!TeacherExists(viewmodel.teacher.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction("Details", new { id = viewmodel.teacher.Id });
+            }
+            return View(viewmodel);
+        }
+
+        private string UploadedFile(TeacherDetailsViewModel viewmodel)
+        {
+            string uniqueFileName = null;
+
+            if (viewmodel.profilePictureFile != null)
+            {
+                string uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/profilePictures");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+                uniqueFileName = Guid.NewGuid().ToString() + "_" + Path.GetFileName(viewmodel.profilePictureFile.FileName);
+                string fileNameWithPath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(fileNameWithPath, FileMode.Create))
+                {
+                    viewmodel.profilePictureFile.CopyTo(stream);
+                }
+            }
+            return uniqueFileName;
+        }
+
     }
 
 }

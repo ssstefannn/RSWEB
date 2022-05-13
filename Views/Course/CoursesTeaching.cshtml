@@ -1,0 +1,76 @@
+﻿@model RSWEB.ViewModels.CourseFilterViewModel
+
+@{
+    ViewData["Title"] = "CoursesTeaching";
+}
+
+<h1>Details of courses teaching by @ViewBag.Message </h1>
+
+<form asp-controller="Course" asp-action="CoursesTeaching" method="get">
+    <p>
+        <input type="hidden" asp-for="id"/>
+        Title: <input type="text" asp-for="Title" />
+        Programme:
+               <input type="text" asp-for="Programme" />
+        Semester:
+               <input type="text" asp-for="Semester" />
+        <input type="submit" value="Filter" />
+    </p>
+</form>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.courses[0].Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.courses[0].Credits)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.courses[0].Semester)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.courses[0].Programme)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.courses[0].EducationLevel)
+            </th>
+            <th>
+                Students Enrolled
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.courses)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Credits)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Semester)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Programme)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EducationLevel)
+                </td>
+                <td>
+                    <a asp-controller="Enrollment" asp-action="StudentsEnrolledAtCourse" asp-route-id="@item.Id" asp-route-teacher="@ViewBag.Message" asp-route-year="2022">
+                        Check Students Enrolled
+                    </a>
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

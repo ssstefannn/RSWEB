@@ -46,18 +46,8 @@ namespace RSWEB.Controllers
 
         public IActionResult Create()
         {
-            var Teachers = _context.Teachers.Select(teacher => teacher).ToList();
-
-            List<SelectListItem> teacherIDs = Teachers.ConvertAll(a =>
-            {
-                return new SelectListItem()
-                {
-                    Text = a.FullName,
-                    Value = a.Id.ToString(),
-                    Selected = false
-                };
-            });
-            ViewBag.TeacherIDs = teacherIDs;
+            ViewData["Teachers"] = new SelectList(_context.Set<Teacher>(), "Id", "FullName");
+            ViewData["Students"] = new SelectList(_context.Set<Student>(), "Id", "FullName");
             return View();
         }
 
@@ -226,6 +216,46 @@ namespace RSWEB.Controllers
         private bool CourseExists(int id)
         {
             return _context.Courses.Any(e => e.Id == id);
+        }
+
+        public async Task<IActionResult> CoursesTeaching(int? id, string title, string programme, int semester)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var teacher = await _context.Teachers
+                .FirstOrDefaultAsync(m => m.Id == id);
+            ViewBag.Message = teacher.FullName;
+            ViewBag.TeacherId = teacher.Id;
+            IQueryable<Course> coursesQuery = _context.Courses.Where(m => m.FirstTeacherId == id || m.SecondTeacherId == id);
+            if (teacher == null)
+            {
+                return NotFound();
+            }
+            IQueryable<int> semestersQuery = _context.Courses.OrderBy(m => m.Semester).Select(m => m.Semester).Distinct();
+            IQueryable<string> programmesQuery = _context.Courses.OrderBy(m => m.Programme).Select(m => m.Programme).Distinct();
+            if (!string.IsNullOrEmpty(title))
+            {
+                coursesQuery = coursesQuery.Where(x => x.Title.Contains(title));
+            }
+            if (semester != null && semester != 0)
+            {
+                coursesQuery = coursesQuery.Where(s => s.Semester == semester);
+            }
+            if (!string.IsNullOrEmpty(programme))
+            {
+                coursesQuery = coursesQuery.Where(p => p.Programme == programme);
+            }
+            var CourseFilterVM = new CourseFilterViewModel
+            {
+                courses = await coursesQuery.Include(c => c.FirstTeacher).Include(c => c.SecondTeacher).ToListAsync(),
+                programmes = new SelectList(await programmesQuery.ToListAsync()),
+                semesters = new SelectList(await semestersQuery.ToListAsync())
+            };
+
+            return View(CourseFilterVM);
         }
     }
 
