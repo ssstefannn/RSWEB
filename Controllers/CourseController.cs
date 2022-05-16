@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using RSWEB.ViewModels;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RSWEB.Controllers
 {
@@ -21,6 +22,7 @@ namespace RSWEB.Controllers
             _context = context;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string Title, int Semester, string Programme)
         {
             IQueryable<Course> coursesQuery = _context.Courses.AsQueryable();
@@ -44,13 +46,15 @@ namespace RSWEB.Controllers
             return View(CoursefilterVM);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            ViewData["Teachers"] = new SelectList(_context.Set<Teacher>(), "Id", "FullName");
-            ViewData["Students"] = new SelectList(_context.Set<Student>(), "Id", "FullName");
+            ViewBag.TeacherIDs = new SelectList(_context.Set<Teacher>(), "Id", "FullName");
+            ViewBag.StudentIDs = new SelectList(_context.Set<Student>(), "Id", "FullName");
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Credits,Semester,Programme,EducationLevel,FirstTeacherId,SecondTeacherId")] Course course)
@@ -64,6 +68,7 @@ namespace RSWEB.Controllers
             return View(course);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -81,6 +86,7 @@ namespace RSWEB.Controllers
             return View(course);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -120,6 +126,7 @@ namespace RSWEB.Controllers
             return View(CourseDetailsVM);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -149,6 +156,7 @@ namespace RSWEB.Controllers
             return View(viewmodel);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, CourseEditViewModel viewmodel)

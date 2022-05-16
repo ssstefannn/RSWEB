@@ -9,18 +9,25 @@ using Microsoft.EntityFrameworkCore;
 using RSWEB.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+using RSWEB.Areas.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RSWEB.Controllers
 {
     public class StudentController : Controller
     {
         private readonly ApplicationDbContext _context;
+        public IServiceProvider _serviceProvider;
 
-        public StudentController(ApplicationDbContext context)
+        public StudentController(ApplicationDbContext context,IServiceProvider serviceProvider)
         {
             _context = context;
+            _serviceProvider = serviceProvider;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string FullName, string StudentId)
         {
             IQueryable<Student> studentsQuery = _context.Students.AsQueryable();
@@ -49,12 +56,14 @@ namespace RSWEB.Controllers
             return View(StudentFilterVM);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["Courses"] = new SelectList(_context.Set<Course>(), "Id", "Title");
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,StudentId,FirstName,LastName,EnrollmentDate,AcquiredCredits,CurrentSemester,EducationLevel")] Student student)
@@ -63,11 +72,20 @@ namespace RSWEB.Controllers
             {
                 _context.Add(student);
                 await _context.SaveChangesAsync();
+                var UserManager = _serviceProvider.GetRequiredService<UserManager<RSWEBUser>>();
+                var User = new RSWEBUser();
+                User.Email = "student" + student.StudentId + "@rsweb.com";
+                User.UserName = "student" + student.StudentId + "@rsweb.com";
+                User.LinkId = student.Id;
+                string userPWD = "Student" + student.StudentId;
+                IdentityResult chkUser = await UserManager.CreateAsync(User, userPWD);
+                if (chkUser.Succeeded) { var result1 = await UserManager.AddToRoleAsync(User, "Student"); }
                 return RedirectToAction(nameof(Index));
             }
             return View(student);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -85,6 +103,7 @@ namespace RSWEB.Controllers
             return View(student);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(long id)

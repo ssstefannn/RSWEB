@@ -14,13 +14,13 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="enrollment.Id" />
             <div class="form-group">
-                <label asp-for="enrollment.Course.Title" class="control-label"></label>
-                <input asp-for="enrollment.Course.Title" class="form-control" readonly="@(true)"></input>
+                <label asp-for="enrollment.Course" class="control-label"></label>
+                <input asp-for="enrollment.CourseId" class="form-control" readonly="@(true)"></input>
                 <span asp-validation-for="enrollment.CourseId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="enrollment.Student.FullName" class="control-label"></label>
-                <input asp-for="enrollment.Student.FullName" class="form-control" asp-items="ViewBag.studentId" readonly="@(true)"></input>
+                <label asp-for="enrollment.StudentId" class="control-label"></label>
+                <input asp-for="enrollment.StudentId" class="form-control" asp-items="ViewBag.studentId" readonly="@(true)"></input>
                 <span asp-validation-for="enrollment.StudentId" class="text-danger"></span>
             </div>
             <div class="form-group">

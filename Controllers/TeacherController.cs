@@ -9,18 +9,25 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using RSWEB.ViewModels;
 using System.IO;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Identity;
+using RSWEB.Areas.Identity.Data;
+using Microsoft.AspNetCore.Authorization;
 
 namespace RSWEB.Controllers
 {
     public class TeacherController : Controller
     {
         private readonly ApplicationDbContext _context;
+        public IServiceProvider _serviceProvider;
 
-        public TeacherController(ApplicationDbContext context)
+        public TeacherController(ApplicationDbContext context,IServiceProvider serviceProvider)
         {
             _context = context;
+            _serviceProvider = serviceProvider;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string FullName, string AcademicRank, string Degree)
         {
             IQueryable<Teacher> teachersQuery = _context.Teachers.AsQueryable();
@@ -60,11 +67,13 @@ namespace RSWEB.Controllers
             return View(TeacherFilterVM);
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,FirstName,LastName,Degree,AcademicRank,OfficeNumber,HireDate")] Teacher teacher)
@@ -73,11 +82,21 @@ namespace RSWEB.Controllers
             {
                 _context.Add(teacher);
                 await _context.SaveChangesAsync();
+                var UserManager = _serviceProvider.GetRequiredService<UserManager<RSWEBUser>>();
+                var User = new RSWEBUser();
+                User.Email = "teacher"+teacher.Id+"@rsweb.com";
+                User.UserName = "teacher" + teacher.Id + "@rsweb.com";
+                User.LinkId = teacher.Id;
+                string userPWD = "Teacher"+teacher.Id;
+                IdentityResult chkUser = await UserManager.CreateAsync(User, userPWD);
+                if (chkUser.Succeeded) { var result1 = await UserManager.AddToRoleAsync(User, "Teacher"); }
                 return RedirectToAction(nameof(Index));
             }
+            
             return View(teacher);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -95,6 +114,7 @@ namespace RSWEB.Controllers
             return View(teacher);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -140,6 +160,7 @@ namespace RSWEB.Controllers
             return View(TeacherDetailsVM);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -155,6 +176,7 @@ namespace RSWEB.Controllers
             return View(teacher);
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,FirstName,LastName,Degree,AcademicRank,OfficeNumber,HireDate")] Teacher teacher)
